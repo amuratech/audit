@@ -31,15 +31,17 @@ module Audit
       formatted_json = AuditHelper::JsonHelper.format json
       formatted_json.each{|k,v| json[k] = v}
 
-      audits.insert_one(json)
+      audit_result = audits.insert_one(json)
 
       if !entries.nil?
+        entries = entries.each{|entry| entry[:audit_id] = audit_result.inserted_id}
         audit_entries.insert_many(entries)
       end
       if !audit_meta.nil?
-        audit_entries.insert_one(audit_meta)
+        audit_entries.insert_one(audit_meta.merge({audit_id: audit_result.inserted_id}))
       end
       if !associations.nil?
+        associations = associations.each{|association| association[:audit_id] = audit_result.inserted_id}
         audit_associations.insert_many(associations)
       end
 

@@ -15,5 +15,38 @@ module Audit
 			base.before_save :ensure_last_modified_by, :ensure_last_modified_via
 			base.include Audit::ModelMethods::InstanceMethods
 		end
+
+		private
+
+		def track_create
+      create_audit_details "create"
+    end
+
+    def track_update
+      create_audit_details "update"
+    end
+
+    def track_destroy
+      create_audit_details "destroy"
+    end
+
+		def ensure_last_modified_by
+      current_user_id = Userstamp::Store.get("current_user_id")
+      if current_user_id.present?
+        self.last_modified_by = current_user_id
+      end
+    end
+
+    def ensure_last_modified_via
+      referer = Audit::Userstamp::Store.get("referer")
+      if referer.present?
+        self.last_modified_via = "api"
+        self.last_modified_via_value = referer
+      else
+        warn "Setting last_modified_via to system for #{self.class} with id #{self.id}" unless Rails.env.test? || Rails.env.development?
+        self.last_modified_via = "system"
+        self.last_modified_via_value = "system"
+      end
+    end
 	end
 end

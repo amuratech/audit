@@ -23,13 +23,17 @@ Or install it yourself as:
 ## Usage
 
 use "enable_audit" on model to enable tracking audits for that class.
-you can specify which updates to track from "create", "update" or "destroy".
-If you want to track associated relation as well you can use "associated_with" option for that purpose.
-associated_with will be an array of association name that has to be tracked
+Following options are available to configure auditing
 
-reference_ids_without_associations:
-This is type of field which will track association which are not actually specified on model but foreign id is stored on model. format to specify this option is as follows
-{name_of_key: "actual name of key", method: "method by which this object can be accessed", klass: model name for the key}
+track: you can specify which updates to track from "create", "update" or "destroy".
+
+audit_fields: Fields on which auditing should take place in case you are auditing updation of record.
+
+indexed_fields: These fields are always added while inserting audit records. So if you want to query on certain fields, you should specify them in this option
+
+associated_with: This option enable you to track changes in belongs_to and polymorphic associated objects. Objects who does not have existance without their parent. Setting up this option will check if audit is enabled on their parent and if it is enabled, audit for that object will also be stored.
+
+reference_ids_without_associations: This is type of field which will track association which are not actually specified on model but foreign id is stored on model. format to specify this option is as: {field: "actual name of key", method: "method by which this object can be accessed", klass: model name for the key}
 
 
 ## Development
